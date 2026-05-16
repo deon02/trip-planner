@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { INTERESTS } from '../../constants'
+
+const inputClass = "h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30 disabled:opacity-50"
+const labelClass = "block text-sm font-medium mb-1.5"
 
 export default function TripForm({ onSubmit, loading }) {
   const [form, setForm] = useState({
@@ -25,27 +25,29 @@ export default function TripForm({ onSubmit, loading }) {
   }
 
   function handleSubmit(e) {
-    if (e?.preventDefault) e.preventDefault()
+    e.preventDefault()
     onSubmit({ ...form, budget: parseInt(form.budget, 10) })
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="origin">From</Label>
-          <Input
+        <div>
+          <label className={labelClass} htmlFor="origin">From</label>
+          <input
             id="origin"
+            className={inputClass}
             placeholder="New York"
             value={form.origin}
             onChange={e => setForm(p => ({ ...p, origin: e.target.value }))}
             required
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="destination">To</Label>
-          <Input
+        <div>
+          <label className={labelClass} htmlFor="destination">To</label>
+          <input
             id="destination"
+            className={inputClass}
             placeholder="Paris, France"
             value={form.destination}
             onChange={e => setForm(p => ({ ...p, destination: e.target.value }))}
@@ -55,21 +57,23 @@ export default function TripForm({ onSubmit, loading }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="start_date">Departure</Label>
-          <Input
+        <div>
+          <label className={labelClass} htmlFor="start_date">Departure</label>
+          <input
             id="start_date"
             type="date"
+            className={inputClass}
             value={form.start_date}
             onChange={e => setForm(p => ({ ...p, start_date: e.target.value }))}
             required
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="end_date">Return</Label>
-          <Input
+        <div>
+          <label className={labelClass} htmlFor="end_date">Return</label>
+          <input
             id="end_date"
             type="date"
+            className={inputClass}
             value={form.end_date}
             onChange={e => setForm(p => ({ ...p, end_date: e.target.value }))}
             required
@@ -77,12 +81,13 @@ export default function TripForm({ onSubmit, loading }) {
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="budget">Budget (EUR)</Label>
-        <Input
+      <div>
+        <label className={labelClass} htmlFor="budget">Budget (EUR)</label>
+        <input
           id="budget"
           type="number"
           min="100"
+          className={inputClass}
           placeholder="2000"
           value={form.budget}
           onChange={e => setForm(p => ({ ...p, budget: e.target.value }))}
@@ -91,7 +96,7 @@ export default function TripForm({ onSubmit, loading }) {
       </div>
 
       <div className="space-y-2">
-        <Label>Interests</Label>
+        <label className={labelClass}>Interests</label>
         <div className="flex flex-wrap gap-2">
           {INTERESTS.map(interest => {
             const val = interest.toLowerCase()
@@ -107,9 +112,13 @@ export default function TripForm({ onSubmit, loading }) {
         </div>
       </div>
 
-      <Button className="w-full" size="lg" disabled={loading} onClick={handleSubmit}>
+      <button
+        type="submit"
+        className="w-full h-10 rounded-lg bg-primary text-primary-foreground text-sm font-medium transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none"
+        disabled={loading}
+      >
         {loading ? 'Planning your trip…' : 'Plan My Trip'}
-      </Button>
+      </button>
     </form>
   )
 }
