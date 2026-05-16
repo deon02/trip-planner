@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TripForm from '../components/TripForm'
+import TripForm from '../components/trip/TripForm'
 import { useTripStream } from '../hooks/useTripStream'
 
 const AGENT_ICONS = {

@@ -1,13 +1,16 @@
+import logging
 import httpx
-import os
 from datetime import date
+from config import settings
+
+logger = logging.getLogger(__name__)
 
 RAPIDAPI_HOST = "booking-com15.p.rapidapi.com"
 
 
 def _headers() -> dict:
     return {
-        "X-RapidAPI-Key": os.getenv("RAPIDAPI_KEY"),
+        "X-RapidAPI-Key": settings.rapidapi_key,
         "X-RapidAPI-Host": RAPIDAPI_HOST,
     }
 
@@ -15,23 +18,20 @@ def _headers() -> dict:
 async def fetch_hotels(destination: str, start_date: date, end_date: date, budget: int) -> dict:
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
-            # Search destination to get dest_id
             loc_resp = await client.get(
                 f"https://{RAPIDAPI_HOST}/api/v1/hotels/searchDestination",
                 headers=_headers(),
                 params={"query": destination},
             )
-            loc_data = loc_resp.json()
-            results = loc_data.get("data", [])
+            results = loc_resp.json().get("data", [])
 
             if not results:
                 return {"error": "Destination not found", "hotels": []}
 
-            dest = results[0]
-            dest_id = dest.get("dest_id")
-            dest_type = dest.get("dest_type", "city")
+            dest_id = results[0].get("dest_id")
+            dest_type = results[0].get("dest_type", "city")
+            nights = max((end_date - start_date).days, 1)
 
-            # Search hotels
             search_resp = await client.get(
                 f"https://{RAPIDAPI_HOST}/api/v1/hotels/searchHotels",
                 headers=_headers(),
@@ -47,21 +47,22 @@ async def fetch_hotels(destination: str, start_date: date, end_date: date, budge
                     "sort_by": "popularity",
                 },
             )
-            search_data = search_resp.json()
-            nights = max((end_date - start_date).days, 1)
 
-            hotels = []
-            for h in search_data.get("data", {}).get("hotels", [])[:3]:
-                prop = h.get("property", {})
-                price = h.get("priceBreakdown", {}).get("grossPrice", {}).get("value", 0)
-                hotels.append({
-                    "name": prop.get("name", "Unknown"),
-                    "rating": round(float(prop.get("reviewScore", 0)), 1),
-                    "price_per_night_usd": round(float(price) / nights, 2),
-                    "address": prop.get("wishlistName", ""),
-                })
+            hotels = [
+                {
+                    "name": h.get("property", {}).get("name", "Unknown"),
+                    "rating": round(float(h.get("property", {}).get("reviewScore", 0)), 1),
+                    "price_per_night_usd": round(
+                        float(h.get("priceBreakdown", {}).get("grossPrice", {}).get("value", 0)) / nights, 2
+                    ),
+                    "address": h.get("property", {}).get("wishlistName", ""),
+                }
+                for h in search_resp.json().get("data", {}).get("hotels", [])[:3]
+            ]
 
+            logger.info("Hotels fetched: %d options", len(hotels))
             return {"hotels": hotels}
 
     except Exception as e:
+        logger.error("Hotel agent failed: %s", e)
         return {"error": str(e), "hotels": []}

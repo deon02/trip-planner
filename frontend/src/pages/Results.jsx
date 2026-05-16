@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import FlightCard from '../components/FlightCard'
-import HotelCard from '../components/HotelCard'
-import MapView from '../components/MapView'
-import ItineraryView from '../components/ItineraryView'
+import FlightCard from '../components/trip/FlightCard'
+import HotelCard from '../components/trip/HotelCard'
+import MapView from '../components/trip/MapView'
+import ItineraryView from '../components/trip/ItineraryView'
 
 export default function Results() {
   const { state } = useLocation()

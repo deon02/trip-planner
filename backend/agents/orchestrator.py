@@ -1,7 +1,8 @@
 import asyncio
 import json
-import os
+import logging
 from typing import AsyncGenerator
+
 import anthropic
 
 from agents.weather_agent import fetch_weather
@@ -9,8 +10,10 @@ from agents.attractions_agent import fetch_attractions
 from agents.flight_agent import fetch_flights
 from agents.hotel_agent import fetch_hotels
 from agents.routing_agent import fetch_route
+from config import settings
 from models.schemas import TripRequest
 
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """
 You are TripMind, an expert travel planning AI. You receive structured data
@@ -19,8 +22,8 @@ day-by-day travel itinerary.
 
 Given:
 - Destination and travel dates
-- Available flights (from Aviationstack)
-- Available hotels (from Booking.com)
+- Available flights
+- Available hotels
 - Weather forecast (from OpenWeatherMap)
 - Nearby attractions (from OpenTripMap)
 - Optimal route between attractions (from Mapbox)
@@ -71,7 +74,7 @@ async def _call_claude(results: dict, request: TripRequest) -> dict:
 Plan a {num_days}-day trip to {request.destination}.
 Travel dates: {request.start_date} to {request.end_date}
 Origin: {request.origin}
-Budget: ${request.budget} EUR total
+Budget: €{request.budget} total
 Interests: {', '.join(request.interests) if request.interests else 'general sightseeing'}
 
 Weather forecast:
@@ -89,12 +92,12 @@ Flight options:
 Hotel options:
 {json.dumps(results.get("hotels", {}), indent=2)}
 
-Use the real attraction coordinates (lat/lng) in your day plan activities.
-If flight or hotel data is empty, estimate realistic options based on your knowledge.
-Return ONLY the JSON object. No markdown fences, no explanation, no preamble.
+Use real attraction coordinates (lat/lng) in activity slots.
+If flight or hotel data is empty, estimate realistic options.
+Return ONLY the JSON object. No markdown, no explanation.
 """
 
-    client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=4096,
@@ -109,6 +112,7 @@ Return ONLY the JSON object. No markdown fences, no explanation, no preamble.
             raw = raw[4:]
         raw = raw.strip()
 
+    logger.info("Itinerary generated for %s", request.destination)
     return json.loads(raw)
 
 
@@ -120,31 +124,20 @@ async def run_orchestrator(request: TripRequest) -> dict:
         fetch_hotels(request.destination, request.start_date, request.end_date, request.budget),
     )
     routing_data = await fetch_route(attractions_data)
-    results = {
-        "weather": weather_data,
-        "attractions": attractions_data,
-        "flights": flight_data,
-        "hotels": hotel_data,
-        "routing": routing_data,
-    }
-    return await _call_claude(results, request)
+    return await _call_claude(
+        {"weather": weather_data, "attractions": attractions_data,
+         "flights": flight_data, "hotels": hotel_data, "routing": routing_data},
+        request,
+    )
 
 
 async def run_orchestrator_stream(request: TripRequest) -> AsyncGenerator[str, None]:
     yield _sse("starting", "Spawning agents in parallel...")
 
-    weather_task = asyncio.create_task(
-        fetch_weather(request.destination, request.start_date, request.end_date)
-    )
-    attractions_task = asyncio.create_task(
-        fetch_attractions(request.destination, request.interests)
-    )
-    flight_task = asyncio.create_task(
-        fetch_flights(request.origin, request.destination, request.start_date, request.end_date)
-    )
-    hotel_task = asyncio.create_task(
-        fetch_hotels(request.destination, request.start_date, request.end_date, request.budget)
-    )
+    weather_task = asyncio.create_task(fetch_weather(request.destination, request.start_date, request.end_date))
+    attractions_task = asyncio.create_task(fetch_attractions(request.destination, request.interests))
+    flight_task = asyncio.create_task(fetch_flights(request.origin, request.destination, request.start_date, request.end_date))
+    hotel_task = asyncio.create_task(fetch_hotels(request.destination, request.start_date, request.end_date, request.budget))
 
     task_meta = {
         weather_task: ("weather", "Weather forecast ready"),

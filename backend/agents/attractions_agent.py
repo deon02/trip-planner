@@ -1,6 +1,8 @@
+import logging
 import httpx
-import os
+from config import settings
 
+logger = logging.getLogger(__name__)
 
 CATEGORY_MAP = {
     "culture": "cultural",
@@ -17,21 +19,18 @@ CATEGORY_MAP = {
 
 
 async def fetch_attractions(destination: str, interests: list[str]) -> dict:
-    api_key = os.getenv("OPENTRIPMAP_API_KEY")
-
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             geo_resp = await client.get(
                 "https://api.opentripmap.com/0.1/en/places/geoname",
-                params={"name": destination, "apikey": api_key},
+                params={"name": destination, "apikey": settings.opentripmap_api_key},
             )
             geo_data = geo_resp.json()
 
             if geo_data.get("status") == "NOT FOUND":
-                return {"error": "destination not found", "attractions": []}
+                return {"error": "Destination not found", "attractions": []}
 
-            lat = geo_data["lat"]
-            lon = geo_data["lon"]
+            lat, lon = geo_data["lat"], geo_data["lon"]
 
             kinds = ",".join(
                 CATEGORY_MAP.get(i.lower(), "interesting_places")
@@ -47,7 +46,7 @@ async def fetch_attractions(destination: str, interests: list[str]) -> dict:
                     "kinds": kinds,
                     "limit": 20,
                     "rate": "3",
-                    "apikey": api_key,
+                    "apikey": settings.opentripmap_api_key,
                     "format": "json",
                 },
             )
@@ -65,7 +64,9 @@ async def fetch_attractions(destination: str, interests: list[str]) -> dict:
                 if p.get("name")
             ]
 
+            logger.info("Attractions fetched for %s — %d results", destination, len(attractions))
             return {"destination_lat": lat, "destination_lon": lon, "attractions": attractions}
 
     except Exception as e:
+        logger.error("Attractions agent failed: %s", e)
         return {"error": str(e), "attractions": []}

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const INTERESTS = ['Culture', 'Food', 'Nature', 'History', 'Art', 'Shopping', 'Nightlife', 'Sport']
+import { INTERESTS } from '../../constants'
 
 export default function TripForm({ onSubmit, loading }) {
   const [form, setForm] = useState({

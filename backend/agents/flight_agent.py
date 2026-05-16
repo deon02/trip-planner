@@ -1,61 +1,72 @@
+import logging
 import httpx
-import os
 from datetime import date
+from config import settings
 
-# Aviationstack free tier is HTTP only (HTTPS requires paid plan)
-BASE = "http://api.aviationstack.com/v1"
+logger = logging.getLogger(__name__)
+
+RAPIDAPI_HOST = "sky-scrapper.p.rapidapi.com"
 
 
-async def _get_iata(client: httpx.AsyncClient, city: str) -> str | None:
+def _headers() -> dict:
+    return {
+        "X-RapidAPI-Key": settings.rapidapi_key,
+        "X-RapidAPI-Host": RAPIDAPI_HOST,
+    }
+
+
+async def _get_airport(client: httpx.AsyncClient, city: str) -> tuple[str, str] | tuple[None, None]:
     resp = await client.get(
-        f"{BASE}/airports",
-        params={"access_key": os.getenv("AVIATIONSTACK_API_KEY"), "search": city, "limit": 1},
+        f"https://{RAPIDAPI_HOST}/api/v1/flights/searchAirport",
+        headers=_headers(),
+        params={"query": city, "locale": "en-US"},
     )
-    data = resp.json()
-    results = data.get("data", [])
-    return results[0]["iata_code"] if results else None
+    results = resp.json().get("data", [])
+    if not results:
+        return None, None
+    return results[0].get("skyId"), results[0].get("entityId")
 
 
 async def fetch_flights(origin: str, destination: str, start_date: date, end_date: date) -> dict:
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
-            origin_iata = await _get_iata(client, origin)
-            dest_iata = await _get_iata(client, destination)
+            origin_sky, origin_entity = await _get_airport(client, origin)
+            dest_sky, dest_entity = await _get_airport(client, destination)
 
-            if not origin_iata or not dest_iata:
+            if not origin_sky or not dest_sky:
                 return {"error": f"Could not resolve airports for {origin} or {destination}", "flights": []}
 
             resp = await client.get(
-                f"{BASE}/flights",
+                f"https://{RAPIDAPI_HOST}/api/v2/flights/searchFlightsComplete",
+                headers=_headers(),
                 params={
-                    "access_key": os.getenv("AVIATIONSTACK_API_KEY"),
-                    "dep_iata": origin_iata,
-                    "arr_iata": dest_iata,
-                    "limit": 5,
+                    "originSkyId": origin_sky,
+                    "destinationSkyId": dest_sky,
+                    "originEntityId": origin_entity,
+                    "destinationEntityId": dest_entity,
+                    "date": str(start_date),
+                    "adults": 1,
+                    "currency": "EUR",
+                    "market": "en-US",
+                    "locale": "en-US",
                 },
             )
-            data = resp.json()
+            itineraries = resp.json().get("data", {}).get("itineraries", [])
 
-            seen_airlines = set()
-            flights = []
-            for f in data.get("data", []):
-                airline = f.get("airline", {}).get("name", "Unknown")
-                if airline in seen_airlines:
-                    continue
-                seen_airlines.add(airline)
-                flights.append({
-                    "airline": airline,
-                    "departure": f.get("departure", {}).get("scheduled", str(start_date)),
-                    "arrival": f.get("arrival", {}).get("scheduled", str(start_date)),
-                    "duration": f.get("flight", {}).get("duration", "N/A"),
-                    "origin_iata": origin_iata,
-                    "dest_iata": dest_iata,
-                })
+            flights = [
+                {
+                    "airline": item["legs"][0]["carriers"]["marketing"][0]["name"],
+                    "departure": item["legs"][0]["departure"],
+                    "arrival": item["legs"][0]["arrival"],
+                    "price_usd": float(item["price"]["raw"]),
+                    "duration": f"{item['legs'][0]['durationInMinutes'] // 60}h {item['legs'][0]['durationInMinutes'] % 60}m",
+                }
+                for item in itineraries[:3]
+            ]
 
-            return {
-                "flights": flights,
-                "note": "Live route data from Aviationstack — prices estimated by AI",
-            }
+            logger.info("Flights fetched: %d options", len(flights))
+            return {"flights": flights}
 
     except Exception as e:
+        logger.error("Flight agent failed: %s", e)
         return {"error": str(e), "flights": []}
