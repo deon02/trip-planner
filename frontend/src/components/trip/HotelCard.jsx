@@ -1,32 +1,32 @@
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+
 export default function HotelCard({ hotel, selected, onSelect }) {
-  const stars = Math.round(hotel.rating / 2)
+  const stars = Math.min(5, Math.round(hotel.rating / 2))
 
   return (
-    <div className={`border rounded-xl p-4 bg-white transition-all ${
-      selected ? 'border-blue-500 shadow-md' : 'border-gray-200 hover:shadow-md'
-    }`}>
-      <div className="flex justify-between items-start">
-        <span className="font-semibold text-gray-900">{hotel.name}</span>
-        <span className="text-lg font-bold text-green-600">
-          €{hotel.price_per_night_usd.toFixed(0)}
-          <span className="text-xs font-normal text-gray-400">/night</span>
-        </span>
-      </div>
-      <div className="flex items-center gap-1 mt-1">
-        <span className="text-yellow-400 text-sm">{'★'.repeat(stars)}{'☆'.repeat(5 - stars)}</span>
-        <span className="text-xs text-gray-500">{hotel.rating}</span>
-      </div>
-      <p className="text-xs text-gray-400 mt-1">{hotel.address}</p>
-      <button
-        onClick={onSelect}
-        className={`mt-3 w-full py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-          selected
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-600'
-        }`}
-      >
-        {selected ? '✓ Route starts here' : 'Use as route start'}
-      </button>
-    </div>
+    <Card className={`transition-all ${selected ? 'ring-2 ring-primary shadow-md' : 'hover:shadow-md'}`}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm truncate">{hotel.name}</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-amber-400 text-xs">{'★'.repeat(stars)}{'☆'.repeat(5 - stars)}</span>
+              <span className="text-xs text-muted-foreground">{hotel.rating}</span>
+            </div>
+            {hotel.address && (
+              <p className="text-xs text-muted-foreground mt-1 truncate">{hotel.address}</p>
+            )}
+          </div>
+          <div className="text-right flex-shrink-0">
+            <p className="font-semibold text-sm">€{hotel.price_per_night_usd.toFixed(0)}</p>
+            <p className="text-xs text-muted-foreground">per night</p>
+          </div>
+        </div>
+        <Button variant={selected ? 'default' : 'outline'} size="sm" className="w-full mt-3 text-xs" onClick={onSelect}>
+          {selected ? '✓ Route starts here' : 'Use as route start'}
+        </Button>
+      </CardContent>
+    </Card>
   )
 }

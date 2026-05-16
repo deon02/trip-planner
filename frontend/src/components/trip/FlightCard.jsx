@@ -1,23 +1,38 @@
-export default function FlightCard({ flight }) {
-  const departure = new Date(flight.departure)
-  const arrival = new Date(flight.arrival)
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
-  const fmt = (d) =>
-    isNaN(d) ? flight.departure : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+export default function FlightCard({ flight }) {
+  const dep = new Date(flight.departure)
+  const arr = new Date(flight.arrival)
+  const fmt = d => isNaN(d) ? '—' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 bg-white hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start">
-        <span className="font-semibold text-gray-900">{flight.airline}</span>
-        <span className="text-lg font-bold text-blue-600">€{flight.price_usd}</span>
-      </div>
-      <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-        <span>{fmt(departure)}</span>
-        <span className="flex-1 border-t border-dashed border-gray-300" />
-        <span className="text-xs text-gray-400">{flight.duration}</span>
-        <span className="flex-1 border-t border-dashed border-gray-300" />
-        <span>{fmt(arrival)}</span>
-      </div>
-    </div>
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
+              {flight.airline?.slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-sm font-medium">{flight.airline}</p>
+              <p className="text-xs text-muted-foreground">{flight.duration}</p>
+            </div>
+          </div>
+          <Badge variant="secondary" className="text-sm font-semibold">€{flight.price_usd}</Badge>
+        </div>
+        <Separator className="my-3" />
+        <div className="flex items-center gap-3 text-sm">
+          <span className="font-semibold">{fmt(dep)}</span>
+          <div className="flex-1 flex items-center gap-1">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[10px] text-muted-foreground px-1">✈</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <span className="font-semibold">{fmt(arr)}</span>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

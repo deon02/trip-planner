@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { supabase } from '../lib/supabase'
+import { useAuth } from '../../context/AuthContext'
+import { supabase } from '../../lib/supabase'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 
 export default function Navbar() {
   const { user } = useAuth()
@@ -12,35 +14,33 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
-      <button onClick={() => navigate('/')} className="font-bold text-gray-900 text-lg tracking-tight">
-        TripMind
-      </button>
-      <div className="flex items-center gap-3">
-        {user ? (
-          <>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="text-sm text-gray-600 hover:text-gray-900 font-medium"
-            >
-              My Trips
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="text-sm text-gray-400 hover:text-gray-600"
-            >
-              Sign out
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => navigate('/login')}
-            className="text-sm bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 font-medium"
-          >
-            Sign in
-          </button>
-        )}
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        <button
+          onClick={() => navigate('/')}
+          className="font-semibold text-base tracking-tight text-foreground hover:text-foreground/80 transition-colors"
+        >
+          TripMind
+        </button>
+
+        <nav className="flex items-center gap-1">
+          {user ? (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+                My Trips
+              </Button>
+              <Separator orientation="vertical" className="h-4 mx-1" />
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" onClick={() => navigate('/login')}>
+              Sign in
+            </Button>
+          )}
+        </nav>
       </div>
-    </nav>
+    </header>
   )
 }

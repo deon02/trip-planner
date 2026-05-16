@@ -6,6 +6,10 @@ import FlightCard from '../components/trip/FlightCard'
 import HotelCard from '../components/trip/HotelCard'
 import MapView from '../components/trip/MapView'
 import ItineraryView from '../components/trip/ItineraryView'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 
 export default function Results() {
   const { state } = useLocation()
@@ -45,57 +49,57 @@ export default function Results() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="min-h-screen pb-16">
       <div className="max-w-3xl mx-auto px-6 pt-8">
-        <div className="flex justify-between items-center mb-6">
-          <button onClick={() => navigate('/')} className="text-blue-600 hover:underline text-sm">
+
+        <div className="flex justify-between items-center mb-8">
+          <Button variant="ghost" size="sm" className="text-muted-foreground -ml-2" onClick={() => navigate('/')}>
             ← Plan another trip
-          </button>
+          </Button>
           {!saved ? (
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : user ? 'Save trip' : 'Sign in to save'}
-            </button>
+            <Button size="sm" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving…' : user ? 'Save trip' : 'Sign in to save'}
+            </Button>
           ) : (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold"
-            >
-              ✓ Saved — View dashboard
-            </button>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/dashboard')}>
+              Saved — View dashboard
+            </Button>
           )}
         </div>
 
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">Your Itinerary</h1>
-          <p className="text-gray-500">{result.summary}</p>
+          <h1 className="text-2xl font-semibold tracking-tight mb-1">Your Itinerary</h1>
+          <p className="text-muted-foreground text-sm">{result.summary}</p>
         </div>
 
         {result.budget_warning && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm">
-            ⚠️ Estimated cost (€{result.total_estimated_cost_usd}) exceeds your budget. Check daily tips for savings.
+          <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3 text-sm dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-400">
+            Estimated cost (€{result.total_estimated_cost_usd}) exceeds your budget. Check daily tips for savings.
           </div>
         )}
 
-        <div className="flex gap-4 mb-8 text-center">
-          <div className="flex-1 bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-gray-900">€{result.total_estimated_cost_usd}</p>
-            <p className="text-xs text-gray-400 mt-1">Estimated total</p>
-          </div>
-          <div className="flex-1 bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-gray-900">{result.days?.length}</p>
-            <p className="text-xs text-gray-400 mt-1">Days planned</p>
-          </div>
+        <div className="grid grid-cols-2 gap-3 mb-8">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-semibold">€{result.total_estimated_cost_usd}</p>
+              <p className="text-xs text-muted-foreground mt-1">Estimated total</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-semibold">{result.days?.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">Days planned</p>
+            </CardContent>
+          </Card>
         </div>
 
         {result.hotels?.length > 0 && (
           <>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">Hotel Options</h2>
-            <p className="text-xs text-gray-400 mb-3">Select a hotel to set it as your daily route starting point</p>
-            <div className="space-y-3 mb-8">
+            <div className="mb-3">
+              <h2 className="text-sm font-semibold">Hotel Options</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Select one to set it as your daily route start</p>
+            </div>
+            <div className="space-y-2 mb-8">
               {result.hotels.map((h, i) => (
                 <HotelCard
                   key={i}
@@ -108,27 +112,30 @@ export default function Results() {
           </>
         )}
 
-        <h2 className="text-lg font-bold text-gray-900 mb-3">
-          Map — Day {activeDay + 1}
+        <Separator className="mb-6" />
+
+        <div className="flex items-baseline gap-2 mb-3">
+          <h2 className="text-sm font-semibold">Map — Day {activeDay + 1}</h2>
           {selectedHotel && (
-            <span className="text-sm font-normal text-blue-600 ml-2">
-              starting from {selectedHotel.name}
-            </span>
+            <span className="text-xs text-muted-foreground">starting from {selectedHotel.name}</span>
           )}
-        </h2>
+        </div>
         <div className="mb-8">
           <MapView days={result.days} activeDay={activeDay} selectedHotel={selectedHotel} />
         </div>
 
-        <h2 className="text-lg font-bold text-gray-900 mb-3">Day by Day</h2>
+        <Separator className="mb-6" />
+
+        <h2 className="text-sm font-semibold mb-3">Day by Day</h2>
         <div className="mb-8">
           <ItineraryView days={result.days} activeDay={activeDay} setActiveDay={setActiveDay} />
         </div>
 
         {result.flights?.length > 0 && (
           <>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">Flight Options</h2>
-            <div className="space-y-3">
+            <Separator className="mb-6" />
+            <h2 className="text-sm font-semibold mb-3">Flight Options</h2>
+            <div className="space-y-2">
               {result.flights.map((f, i) => <FlightCard key={i} flight={f} />)}
             </div>
           </>

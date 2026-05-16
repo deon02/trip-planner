@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -31,71 +36,73 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-sm">
-        <button onClick={() => navigate('/')} className="text-sm text-gray-400 hover:text-gray-600 mb-6 block">
-          ← Back
-        </button>
+    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-6">
+      <Card className="w-full max-w-sm shadow-sm">
+        <CardContent className="p-6">
+          <Button variant="ghost" size="sm" className="-ml-2 mb-5 text-muted-foreground" onClick={() => navigate('/')}>
+            ← Back
+          </Button>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
-          {mode === 'login' ? 'Welcome back' : 'Create account'}
-        </h1>
-        <p className="text-gray-400 text-sm mb-6">
-          {mode === 'login' ? 'Sign in to access your saved trips' : 'Start planning and saving trips'}
-        </p>
+          <h1 className="text-xl font-semibold tracking-tight mb-1">
+            {mode === 'login' ? 'Welcome back' : 'Create account'}
+          </h1>
+          <p className="text-muted-foreground text-sm mb-6">
+            {mode === 'login' ? 'Sign in to access your saved trips' : 'Start planning and saving trips'}
+          </p>
 
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm">
-            {success}
-          </div>
-        )}
+          {error && (
+            <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-3 py-2.5 text-sm">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg px-3 py-2.5 text-sm dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400">
+              {success}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                minLength={6}
+                placeholder="••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+            </Button>
+          </form>
 
-        <p className="text-center text-sm text-gray-400 mt-5">
-          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-          <button
-            onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
-            className="text-blue-600 hover:underline font-medium"
-          >
-            {mode === 'login' ? 'Sign up' : 'Sign in'}
-          </button>
-        </p>
-      </div>
+          <Separator className="my-5" />
+
+          <p className="text-center text-sm text-muted-foreground">
+            {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+            <button
+              onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
+              className="text-foreground font-medium hover:underline underline-offset-4"
+            >
+              {mode === 'login' ? 'Sign up' : 'Sign in'}
+            </button>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }

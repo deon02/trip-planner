@@ -1,8 +1,11 @@
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
-const SLOT_STYLES = {
-  morning: 'bg-amber-50 text-amber-700',
-  afternoon: 'bg-emerald-50 text-emerald-700',
-  evening: 'bg-indigo-50 text-indigo-700',
+const SLOT_VARIANT = {
+  morning: 'bg-amber-50 text-amber-700 border-amber-200',
+  afternoon: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  evening: 'bg-indigo-50 text-indigo-700 border-indigo-200',
 }
 
 export default function ItineraryView({ days, activeDay, setActiveDay }) {
@@ -15,10 +18,10 @@ export default function ItineraryView({ days, activeDay, setActiveDay }) {
           <button
             key={i}
             onClick={() => setActiveDay(i)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0 border ${
               activeDay === i
-                ? 'bg-blue-600 text-white'
-                : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300'
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-background border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
             }`}
           >
             Day {d.day}
@@ -26,35 +29,43 @@ export default function ItineraryView({ days, activeDay, setActiveDay }) {
         ))}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-gray-900">{day.date}</h3>
-          <span className="text-sm text-gray-400">
-            {day.weather.condition} · {day.weather.temp_low}°–{day.weather.temp_high}°C
-          </span>
-        </div>
+      <Card>
+        <CardContent className="p-5">
+          <div className="flex justify-between items-start mb-4">
+            <p className="font-semibold text-sm">{day.date}</p>
+            <p className="text-xs text-muted-foreground">
+              {day.weather.condition} · {day.weather.temp_low}°–{day.weather.temp_high}°C
+            </p>
+          </div>
 
-        <div className="space-y-4">
-          {['morning', 'afternoon', 'evening'].map(slot => (
-            <div key={slot} className="flex gap-3">
-              <span className={`text-xs font-semibold px-2 py-1 rounded capitalize h-fit w-20 text-center flex-shrink-0 ${SLOT_STYLES[slot]}`}>
-                {slot}
-              </span>
-              <div className="min-w-0">
-                <p className="font-medium text-gray-800 text-sm">{day[slot].place}</p>
-                <p className="text-gray-500 text-sm">{day[slot].activity}</p>
-                <p className="text-gray-400 text-xs mt-0.5">{day[slot].duration_hours}h</p>
+          <div className="space-y-4">
+            {['morning', 'afternoon', 'evening'].map((slot, idx) => (
+              <div key={slot}>
+                {idx > 0 && <Separator className="mb-4" />}
+                <div className="flex gap-3">
+                  <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-md capitalize h-fit w-[4.5rem] text-center flex-shrink-0 border ${SLOT_VARIANT[slot]}`}>
+                    {slot}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm">{day[slot].place}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{day[slot].activity}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">{day[slot].duration_hours}h</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {day.tips && (
-          <p className="mt-4 text-xs text-blue-700 bg-blue-50 rounded-lg px-3 py-2">
-            💡 {day.tips}
-          </p>
-        )}
-      </div>
+          {day.tips && (
+            <>
+              <Separator className="mt-4 mb-3" />
+              <p className="text-xs text-muted-foreground bg-muted rounded-lg px-3 py-2.5 leading-relaxed">
+                {day.tips}
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
