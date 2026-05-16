@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 
 export default function Navbar() {
   const { user } = useAuth()
@@ -14,11 +12,11 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-black/[0.07]">
+      <div className="max-w-5xl mx-auto px-6 h-[52px] flex items-center justify-between">
         <button
           onClick={() => navigate('/')}
-          className="font-semibold text-base tracking-tight bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+          className="text-sm font-semibold text-foreground tracking-tight hover:opacity-60 transition-opacity"
         >
           TripMind
         </button>
@@ -26,18 +24,26 @@ export default function Navbar() {
         <nav className="flex items-center gap-1">
           {user ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground transition-colors rounded-lg hover:bg-black/[0.04]"
+              >
                 My Trips
-              </Button>
-              <Separator orientation="vertical" className="h-4 mx-1" />
-              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleSignOut}>
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="px-3 py-1.5 text-sm text-foreground/50 hover:text-foreground transition-colors rounded-lg hover:bg-black/[0.04]"
+              >
                 Sign out
-              </Button>
+              </button>
             </>
           ) : (
-            <Button size="sm" onClick={() => navigate('/login')}>
+            <button
+              onClick={() => navigate('/login')}
+              className="px-4 py-1.5 text-sm font-medium bg-foreground text-white rounded-full hover:opacity-80 transition-opacity"
+            >
               Sign in
-            </Button>
+            </button>
           )}
         </nav>
       </div>

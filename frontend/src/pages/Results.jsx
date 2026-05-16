@@ -6,9 +6,6 @@ import FlightCard from '../components/trip/FlightCard'
 import HotelCard from '../components/trip/HotelCard'
 import MapView from '../components/trip/MapView'
 import ItineraryView from '../components/trip/ItineraryView'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 
 export default function Results() {
   const { state } = useLocation()
@@ -48,57 +45,82 @@ export default function Results() {
   }
 
   return (
-    <div className="min-h-screen pb-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
+    <div className="min-h-screen bg-white pb-20">
+      <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-8 sm:pt-12">
 
-        <div className="flex flex-wrap items-center gap-2 justify-between mb-6 sm:mb-8">
-          <Button variant="ghost" size="sm" className="text-muted-foreground -ml-2" onClick={() => navigate('/')}>
-            ← Plan another trip
-          </Button>
+        {/* Top nav */}
+        <div className="flex items-center justify-between mb-10">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1.5 text-[13px] text-black/40 hover:text-foreground transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Plan another
+          </button>
+
           {!saved ? (
-            <Button size="sm" onClick={handleSave} disabled={saving}>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-4 py-2 rounded-full bg-foreground text-white text-[13px] font-semibold hover:opacity-80 transition-opacity disabled:opacity-40"
+            >
               {saving ? 'Saving…' : user ? 'Save trip' : 'Sign in to save'}
-            </Button>
+            </button>
           ) : (
-            <Button variant="secondary" size="sm" onClick={() => navigate('/dashboard')}>
-              Saved — View dashboard
-            </Button>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-4 py-2 rounded-full border border-black/[0.12] text-[13px] font-medium text-black/60 hover:border-black/[0.30] hover:text-foreground transition-all"
+            >
+              Saved → Dashboard
+            </button>
           )}
         </div>
 
-        <div className="mb-5">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight mb-1">Your Itinerary</h1>
-          <p className="text-muted-foreground text-sm">{result.summary}</p>
+        {/* Heading */}
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">Your Itinerary</h1>
+          <p className="text-[15px] text-black/50 leading-relaxed">{result.summary}</p>
         </div>
 
         {result.budget_warning && (
-          <div className="mb-5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3 text-sm">
-            Estimated cost (€{result.total_estimated_cost_usd}) exceeds your budget. Check daily tips for savings.
+          <div className="mb-6 bg-amber-50 border border-amber-100 text-amber-800 rounded-2xl px-4 py-3 text-sm">
+            Estimated cost (€{result.total_estimated_cost_usd}) exceeds your budget. See daily tips for savings ideas.
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3 mb-6 sm:mb-8">
-          <Card>
-            <CardContent className="p-3 sm:p-4 text-center">
-              <p className="text-xl sm:text-2xl font-semibold">€{result.total_estimated_cost_usd}</p>
-              <p className="text-xs text-muted-foreground mt-1">Estimated total</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3 sm:p-4 text-center">
-              <p className="text-xl sm:text-2xl font-semibold">{result.days?.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">Days planned</p>
-            </CardContent>
-          </Card>
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3 mb-10">
+          {[
+            { value: `€${result.total_estimated_cost_usd}`, label: 'Estimated total' },
+            { value: result.days?.length, label: 'Days planned' },
+          ].map(stat => (
+            <div key={stat.label} className="border border-black/[0.08] rounded-2xl p-5 text-center bg-white">
+              <p className="text-2xl sm:text-3xl font-bold tracking-tight">{stat.value}</p>
+              <p className="text-[12px] text-black/40 mt-1.5 font-medium">{stat.label}</p>
+            </div>
+          ))}
         </div>
 
-        {result.hotels?.length > 0 && (
-          <>
-            <div className="mb-3">
-              <h2 className="text-sm font-semibold">Hotel Options</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Select one to set it as your daily route start</p>
+        {/* Flights */}
+        {result.flights?.length > 0 && (
+          <section className="mb-10">
+            <SectionHeader title="Flight Options" />
+            <div className="space-y-2.5">
+              {result.flights.map((f, i) => <FlightCard key={i} flight={f} />)}
             </div>
-            <div className="space-y-2 mb-6 sm:mb-8">
+          </section>
+        )}
+
+        {/* Hotels */}
+        {result.hotels?.length > 0 && (
+          <section className="mb-10">
+            <SectionHeader
+              title="Pick your hotel"
+              subtitle="Select one — it sets the start point for your daily map routes."
+            />
+            <div className="space-y-2.5">
               {result.hotels.map((h, i) => (
                 <HotelCard
                   key={i}
@@ -108,38 +130,36 @@ export default function Results() {
                 />
               ))}
             </div>
-          </>
+          </section>
         )}
 
-        <Separator className="mb-5" />
+        {/* Map */}
+        <section className="mb-10">
+          <SectionHeader
+            title={`Map — Day ${activeDay + 1}`}
+            subtitle={selectedHotel ? `Starting from ${selectedHotel.name}` : 'Select a hotel above to set your route start'}
+          />
+          <div className="rounded-2xl overflow-hidden border border-black/[0.08]">
+            <MapView days={result.days} activeDay={activeDay} selectedHotel={selectedHotel} />
+          </div>
+        </section>
 
-        <div className="flex flex-wrap items-baseline gap-2 mb-3">
-          <h2 className="text-sm font-semibold">Map — Day {activeDay + 1}</h2>
-          {selectedHotel && (
-            <span className="text-xs text-muted-foreground truncate">starting from {selectedHotel.name}</span>
-          )}
-        </div>
-        <div className="mb-6 sm:mb-8">
-          <MapView days={result.days} activeDay={activeDay} selectedHotel={selectedHotel} />
-        </div>
-
-        <Separator className="mb-5" />
-
-        <h2 className="text-sm font-semibold mb-3">Day by Day</h2>
-        <div className="mb-6 sm:mb-8">
+        {/* Itinerary */}
+        <section className="mb-10">
+          <SectionHeader title="Day by Day" />
           <ItineraryView days={result.days} activeDay={activeDay} setActiveDay={setActiveDay} />
-        </div>
+        </section>
 
-        {result.flights?.length > 0 && (
-          <>
-            <Separator className="mb-5" />
-            <h2 className="text-sm font-semibold mb-3">Flight Options</h2>
-            <div className="space-y-2">
-              {result.flights.map((f, i) => <FlightCard key={i} flight={f} />)}
-            </div>
-          </>
-        )}
       </div>
+    </div>
+  )
+}
+
+function SectionHeader({ title, subtitle }) {
+  return (
+    <div className="mb-4">
+      <h2 className="text-[15px] font-semibold text-foreground">{title}</h2>
+      {subtitle && <p className="text-[12px] text-black/40 mt-0.5">{subtitle}</p>}
     </div>
   )
 }

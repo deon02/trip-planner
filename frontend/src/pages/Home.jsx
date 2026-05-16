@@ -2,36 +2,38 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TripForm from '../components/trip/TripForm'
 import { useTripStream } from '../hooks/useTripStream'
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 
 const AGENT_STEPS = [
   { key: 'weather',     label: 'Weather forecast'       },
   { key: 'flights',     label: 'Flight options'          },
   { key: 'hotels',      label: 'Hotel availability'      },
-  { key: 'attractions', label: 'Attractions & POIs'      },
+  { key: 'attractions', label: 'Attractions & points of interest' },
   { key: 'routing',     label: 'Mapping daily routes'    },
-  { key: 'building',    label: 'Building itinerary (AI)' },
+  { key: 'building',    label: 'Building your itinerary' },
 ]
 
 function AgentRow({ label, status }) {
   return (
-    <li className="flex items-center gap-3">
-      <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+    <li className="flex items-center gap-3 py-1">
+      <span className="relative flex h-2 w-2 flex-shrink-0">
         {status === 'running' && (
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
         )}
-        <span className={`relative inline-flex h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
-          status === 'done' ? 'bg-emerald-500' : status === 'running' ? 'bg-amber-400' : 'bg-border'
+        <span className={`relative inline-flex h-2 w-2 rounded-full transition-colors duration-500 ${
+          status === 'done' ? 'bg-emerald-500' : status === 'running' ? 'bg-amber-400' : 'bg-black/20'
         }`} />
       </span>
-      <span className={`text-sm transition-colors duration-300 ${
-        status === 'done' ? 'text-foreground' : status === 'running' ? 'text-foreground/80' : 'text-muted-foreground/50'
+      <span className={`text-[13px] transition-colors duration-300 ${
+        status === 'done' ? 'text-foreground' : status === 'running' ? 'text-foreground' : 'text-black/30'
       }`}>
         {label}
       </span>
-      {status === 'done' && <span className="ml-auto text-xs text-emerald-500 font-medium">Done</span>}
-      {status === 'running' && <span className="ml-auto text-xs text-amber-500 font-medium">Working…</span>}
+      {status === 'done' && (
+        <span className="ml-auto text-[11px] font-medium text-emerald-600">Done</span>
+      )}
+      {status === 'running' && (
+        <span className="ml-auto text-[11px] font-medium text-amber-600">Working…</span>
+      )}
     </li>
   )
 }
@@ -49,52 +51,63 @@ export default function Home() {
   const hasStarted = Object.values(agents).some(s => s !== 'idle')
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-br from-indigo-50 via-background to-violet-50/60">
-      <div className="mb-6 sm:mb-8 text-center">
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-2 bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent">
-          Plan your next trip
-        </h1>
-        <p className="text-muted-foreground text-sm sm:text-base">AI agents research flights, hotels, weather, and attractions in seconds.</p>
+    <div className="min-h-[calc(100vh-52px)] bg-white flex flex-col">
+
+      {/* Hero */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-10">
+        <div className="w-full max-w-xl">
+
+          <div className="mb-10 text-center">
+            <h1 className="text-4xl sm:text-[56px] font-bold tracking-tight leading-[1.05] text-foreground mb-4">
+              Plan your<br className="hidden sm:block" /> perfect trip.
+            </h1>
+            <p className="text-[15px] sm:text-base text-black/50 leading-relaxed max-w-sm mx-auto">
+              AI agents research flights, hotels, weather, and attractions in seconds.
+            </p>
+          </div>
+
+          {error && (
+            <div className="mb-5 bg-red-50 border border-red-100 text-red-700 rounded-xl px-4 py-3 text-sm">
+              {error}
+            </div>
+          )}
+
+          {loading && hasStarted && (
+            <div className="mb-5 bg-black/[0.02] border border-black/[0.06] rounded-2xl px-5 py-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-semibold tracking-widest text-black/40 uppercase">
+                  Planning your trip
+                </span>
+                <span className="text-[11px] font-semibold tabular-nums text-black/50">{progress}%</span>
+              </div>
+              <div className="w-full h-[3px] bg-black/[0.06] rounded-full mb-4 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-foreground transition-all duration-700 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <ul className="space-y-0.5">
+                {AGENT_STEPS.map(({ key, label }) => (
+                  <AgentRow key={key} label={label} status={agents[key]} />
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="bg-white border border-black/[0.08] rounded-2xl shadow-[0_2px_24px_rgba(0,0,0,0.06)] p-6 sm:p-8">
+            <TripForm onSubmit={startTrip} loading={loading} />
+          </div>
+
+        </div>
       </div>
 
-      {error && (
-        <div className="mb-4 w-full max-w-lg bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-4 py-3 text-sm">
-          {error}
-        </div>
-      )}
+      {/* Footer */}
+      <div className="pb-10 text-center">
+        <p className="text-[12px] text-black/30 tracking-wide">
+          Powered by Claude · Mapbox · real-time flight &amp; hotel data
+        </p>
+      </div>
 
-      {loading && hasStarted && (
-        <Card className="mb-4 w-full max-w-lg border-indigo-100 shadow-md shadow-indigo-100/50">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Agent progress</p>
-              <p className="text-xs font-semibold tabular-nums text-primary">{progress}%</p>
-            </div>
-            <div className="w-full h-1.5 bg-border rounded-full mb-4 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-indigo-500 to-violet-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <ul className="space-y-3">
-              {AGENT_STEPS.map(({ key, label }) => (
-                <AgentRow key={key} label={label} status={agents[key]} />
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card className="w-full max-w-lg shadow-md shadow-indigo-100/40 border-indigo-100/60">
-        <CardContent className="p-4 sm:p-6">
-          <TripForm onSubmit={startTrip} loading={loading} />
-        </CardContent>
-      </Card>
-
-      <Separator className="my-6 sm:my-8 max-w-lg w-full" />
-      <p className="text-xs text-muted-foreground text-center">
-        Powered by Claude · Mapbox · real-time flight & hotel data
-      </p>
     </div>
   )
 }

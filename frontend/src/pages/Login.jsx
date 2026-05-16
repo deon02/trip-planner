@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+
+const inputClass = "h-11 w-full rounded-xl border border-black/[0.10] bg-transparent px-3.5 text-sm text-foreground outline-none transition-all placeholder:text-black/30 focus:border-foreground/30 focus:ring-2 focus:ring-black/[0.08]"
+const labelClass = "block text-[11px] font-semibold tracking-widest text-black/40 uppercase mb-2"
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -36,73 +34,83 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-sm shadow-sm">
-        <CardContent className="p-6">
-          <Button variant="ghost" size="sm" className="-ml-2 mb-5 text-muted-foreground" onClick={() => navigate('/')}>
-            ← Back
-          </Button>
+    <div className="min-h-[calc(100vh-52px)] bg-[#f5f5f7] flex items-center justify-center px-5 py-10">
+      <div className="w-full max-w-sm bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_24px_rgba(0,0,0,0.06)] px-8 py-10">
 
-          <h1 className="text-xl font-semibold tracking-tight mb-1">
-            {mode === 'login' ? 'Welcome back' : 'Create account'}
-          </h1>
-          <p className="text-muted-foreground text-sm mb-6">
-            {mode === 'login' ? 'Sign in to access your saved trips' : 'Start planning and saving trips'}
-          </p>
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1 text-[13px] text-black/40 hover:text-foreground transition-colors mb-10"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back
+        </button>
 
-          {error && (
-            <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-3 py-2.5 text-sm">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg px-3 py-2.5 text-sm dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400">
-              {success}
-            </div>
-          )}
+        <h1 className="text-3xl font-bold tracking-tight mb-1">
+          {mode === 'login' ? 'Welcome back.' : 'Create account.'}
+        </h1>
+        <p className="text-[14px] text-black/40 mb-8">
+          {mode === 'login' ? 'Sign in to access your saved trips.' : 'Start planning and saving trips.'}
+        </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                minLength={6}
-                placeholder="••••••"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
-            </Button>
-          </form>
+        {error && (
+          <div className="mb-5 bg-red-50 border border-red-100 text-red-700 rounded-xl px-4 py-3 text-[13px]">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="mb-5 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl px-4 py-3 text-[13px]">
+            {success}
+          </div>
+        )}
 
-          <Separator className="my-5" />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className={labelClass}>Email</label>
+            <input
+              type="email"
+              required
+              className={inputClass}
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Password</label>
+            <input
+              type="password"
+              required
+              minLength={6}
+              className={inputClass}
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-11 rounded-full bg-foreground text-white text-sm font-semibold hover:opacity-80 transition-opacity disabled:opacity-30 disabled:pointer-events-none mt-2"
+          >
+            {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+          </button>
+        </form>
 
-          <p className="text-center text-sm text-muted-foreground">
+        <div className="mt-8 pt-6 border-t border-black/[0.06] text-center">
+          <p className="text-[13px] text-black/40">
             {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
             <button
               onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
-              className="text-foreground font-medium hover:underline underline-offset-4"
+              className="text-foreground font-semibold hover:opacity-60 transition-opacity"
             >
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+
+      </div>
     </div>
   )
 }

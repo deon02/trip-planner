@@ -5,7 +5,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -33,25 +33,25 @@
 }
 
 :root {
-  --background: oklch(0.99 0.003 264);
-  --foreground: oklch(0.15 0.02 264);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.10 0.005 264);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 264);
+  --card-foreground: oklch(0.10 0.005 264);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 264);
-  --primary: oklch(0.52 0.22 264);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.94 0.04 264);
-  --secondary-foreground: oklch(0.35 0.12 264);
-  --muted: oklch(0.96 0.01 264);
-  --muted-foreground: oklch(0.52 0.04 264);
-  --accent: oklch(0.93 0.05 264);
-  --accent-foreground: oklch(0.35 0.12 264);
+  --popover-foreground: oklch(0.10 0.005 264);
+  --primary: oklch(0.10 0.005 264);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.25 0.005 264);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.50 0.005 264);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.25 0.005 264);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.02 264);
-  --input: oklch(0.9 0.02 264);
-  --ring: oklch(0.52 0.22 264);
-  --radius: 0.625rem;
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.10 0.005 264);
+  --radius: 0.75rem;
 }
 
 * {
@@ -62,4 +62,5 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
