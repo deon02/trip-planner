@@ -18,7 +18,7 @@ export default function Navbar() {
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
         <button
           onClick={() => navigate('/')}
-          className="font-semibold text-base tracking-tight text-foreground hover:text-foreground/80 transition-colors"
+          className="font-semibold text-base tracking-tight bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
         >
           TripMind
         </button>

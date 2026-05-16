@@ -74,7 +74,7 @@ export default function Dashboard() {
             {trips.map(trip => (
               <Card
                 key={trip.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
+                className="cursor-pointer hover:shadow-md hover:-translate-y-px hover:shadow-indigo-100 transition-all duration-200"
                 onClick={() => navigate('/results', { state: { result: trip.itinerary } })}
               >
                 <CardContent className="p-5">

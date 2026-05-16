@@ -49,9 +49,11 @@ export default function Home() {
   const hasStarted = Object.values(agents).some(s => s !== 'idle')
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-br from-indigo-50 via-background to-violet-50/60">
       <div className="mb-6 sm:mb-8 text-center">
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-2">Plan your next trip</h1>
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-2 bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent">
+          Plan your next trip
+        </h1>
         <p className="text-muted-foreground text-sm sm:text-base">AI agents research flights, hotels, weather, and attractions in seconds.</p>
       </div>
 
@@ -62,15 +64,15 @@ export default function Home() {
       )}
 
       {loading && hasStarted && (
-        <Card className="mb-4 w-full max-w-lg">
+        <Card className="mb-4 w-full max-w-lg border-indigo-100 shadow-md shadow-indigo-100/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Agent progress</p>
-              <p className="text-xs font-semibold tabular-nums text-foreground">{progress}%</p>
+              <p className="text-xs font-semibold tabular-nums text-primary">{progress}%</p>
             </div>
-            <div className="w-full h-1 bg-border rounded-full mb-4 overflow-hidden">
+            <div className="w-full h-1.5 bg-border rounded-full mb-4 overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-500 ease-out"
+                className="h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-indigo-500 to-violet-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -83,7 +85,7 @@ export default function Home() {
         </Card>
       )}
 
-      <Card className="w-full max-w-lg shadow-sm">
+      <Card className="w-full max-w-lg shadow-md shadow-indigo-100/40 border-indigo-100/60">
         <CardContent className="p-4 sm:p-6">
           <TripForm onSubmit={startTrip} loading={loading} />
         </CardContent>

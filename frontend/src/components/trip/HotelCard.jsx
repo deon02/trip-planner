@@ -5,7 +5,7 @@ export default function HotelCard({ hotel, selected, onSelect }) {
   const stars = Math.min(5, Math.round(hotel.rating / 2))
 
   return (
-    <Card className={`transition-all ${selected ? 'ring-2 ring-primary shadow-md' : 'hover:shadow-md'}`}>
+    <Card className={`transition-all duration-200 ${selected ? 'ring-2 ring-primary shadow-md shadow-indigo-100' : 'hover:shadow-md hover:-translate-y-px hover:shadow-indigo-100'}`}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">

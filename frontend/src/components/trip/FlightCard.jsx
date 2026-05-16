@@ -8,7 +8,7 @@ export default function FlightCard({ flight }) {
   const fmt = d => isNaN(d) ? '—' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md hover:-translate-y-px hover:shadow-indigo-100 transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

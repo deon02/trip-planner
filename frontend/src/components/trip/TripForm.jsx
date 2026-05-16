@@ -114,7 +114,7 @@ export default function TripForm({ onSubmit, loading }) {
 
       <button
         type="submit"
-        className="w-full h-10 rounded-lg bg-primary text-primary-foreground text-sm font-medium transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none"
+        className="w-full h-10 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium transition-all hover:from-indigo-600 hover:to-violet-600 hover:shadow-md hover:shadow-indigo-200 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none"
         disabled={loading}
       >
         {loading ? 'Planning your trip…' : 'Plan My Trip'}
