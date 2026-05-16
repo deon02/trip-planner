@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,8 +26,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="TripMind API", version="1.0.0", description="AI-powered travel planning API", lifespan=lifespan)
 
+_production_origins = [o for o in os.environ.get("FRONTEND_URL", "").split(",") if o]
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=_production_origins,
     allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
@@ -48,4 +51,4 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), reload=True)
