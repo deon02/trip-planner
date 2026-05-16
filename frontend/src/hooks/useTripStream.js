@@ -2,15 +2,24 @@ import { useState, useCallback } from 'react'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
+const INITIAL_AGENTS = {
+  weather: 'idle',
+  attractions: 'idle',
+  flights: 'idle',
+  hotels: 'idle',
+  routing: 'idle',
+  building: 'idle',
+}
+
 export function useTripStream() {
-  const [messages, setMessages] = useState([])
+  const [agents, setAgents] = useState(INITIAL_AGENTS)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const startTrip = useCallback(async (tripData) => {
     setLoading(true)
-    setMessages([])
+    setAgents(INITIAL_AGENTS)
     setResult(null)
     setError(null)
 
@@ -42,11 +51,25 @@ export function useTripStream() {
           if (!line.startsWith('data: ')) continue
           try {
             const data = JSON.parse(line.slice(6))
+
             if (data.status === 'complete') {
+              setAgents(prev => ({ ...prev, building: 'done' }))
               setResult({ result: data.result, route: data.route || null, tripRequest: tripData })
               setLoading(false)
-            } else {
-              setMessages((prev) => [...prev, data.message])
+            } else if (data.status === 'starting') {
+              setAgents(prev => ({
+                ...prev,
+                weather: 'running',
+                attractions: 'running',
+                flights: 'running',
+                hotels: 'running',
+              }))
+            } else if (data.status === 'agent_done' && data.data?.agent) {
+              setAgents(prev => ({ ...prev, [data.data.agent]: 'done' }))
+            } else if (data.status === 'fetching') {
+              setAgents(prev => ({ ...prev, routing: 'running' }))
+            } else if (data.status === 'building') {
+              setAgents(prev => ({ ...prev, routing: 'done', building: 'running' }))
             }
           } catch {
             // partial chunk, skip
@@ -59,5 +82,5 @@ export function useTripStream() {
     }
   }, [])
 
-  return { startTrip, messages, result, loading, error }
+  return { startTrip, agents, result, loading, error }
 }
