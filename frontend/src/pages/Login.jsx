@@ -36,7 +36,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-6">
+    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-8">
       <Card className="w-full max-w-sm shadow-sm">
         <CardContent className="p-6">
           <Button variant="ghost" size="sm" className="-ml-2 mb-5 text-muted-foreground" onClick={() => navigate('/')}>

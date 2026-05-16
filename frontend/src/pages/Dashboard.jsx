@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   if (loading) return (
     <div className="min-h-screen pb-16">
-      <div className="max-w-3xl mx-auto px-6 pt-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
         <div className="flex justify-between items-center mb-8">
           <div className="space-y-2">
             <Skeleton className="h-7 w-28" />
@@ -53,7 +53,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen pb-16">
-      <div className="max-w-3xl mx-auto px-6 pt-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">My Trips</h1>

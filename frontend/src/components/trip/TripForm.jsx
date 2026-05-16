@@ -30,8 +30,8 @@ export default function TripForm({ onSubmit, loading }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className={labelClass} htmlFor="origin">From</label>
           <input
@@ -56,7 +56,7 @@ export default function TripForm({ onSubmit, loading }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className={labelClass} htmlFor="start_date">Departure</label>
           <input

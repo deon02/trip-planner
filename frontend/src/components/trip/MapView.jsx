@@ -157,7 +157,7 @@ export default function MapView({ days, activeDay, selectedHotel }) {
 
   return (
     <div className="space-y-2">
-      <div ref={container} className="w-full h-[400px] rounded-xl overflow-hidden shadow-sm" />
+      <div ref={container} className="w-full h-[260px] sm:h-[400px] rounded-xl overflow-hidden shadow-sm" />
       <div className="flex gap-4 text-xs text-gray-400">
         <span><span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1" />Morning</span>
         <span><span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1" />Afternoon</span>
