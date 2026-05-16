@@ -25,7 +25,7 @@ export default function TripForm({ onSubmit, loading }) {
   }
 
   function handleSubmit(e) {
-    e.preventDefault()
+    if (e?.preventDefault) e.preventDefault()
     onSubmit({ ...form, budget: parseInt(form.budget, 10) })
   }
 
@@ -107,7 +107,7 @@ export default function TripForm({ onSubmit, loading }) {
         </div>
       </div>
 
-      <Button type="submit" className="w-full" size="lg" disabled={loading}>
+      <Button className="w-full" size="lg" disabled={loading} onClick={handleSubmit}>
         {loading ? 'Planning your trip…' : 'Plan My Trip'}
       </Button>
     </form>
